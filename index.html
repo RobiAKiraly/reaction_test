@@ -10,17 +10,29 @@
 
     <header>
         <h1>⚡ Reaction Tester</h1>
-        <p>Test your reflexes with two different games.</p>
+        <p>Test your reflexes in two different challenges.</p>
     </header>
 
     <div class="menu">
-        <button onclick="showGame('f1')">F1 Lights</button>
-        <button onclick="showGame('click')">Target Click</button>
+        <button onclick="showGame('f1')">
+            🏁 F1 Lights
+        </button>
+
+        <button onclick="showGame('click')">
+            🎯 30 Second Challenge
+        </button>
     </div>
 
-    <!-- F1 GAME -->
+    <!-- ================= F1 GAME ================= -->
+
     <section id="f1Game" class="game">
+
         <h2>🏁 F1 Reaction Test</h2>
+
+        <p>
+            Press START, wait for the lights to go out,
+            then press STOP as quickly as possible.
+        </p>
 
         <div class="lights">
             <div class="light"></div>
@@ -30,24 +42,42 @@
             <div class="light"></div>
         </div>
 
-        <button id="startF1">Start</button>
-        <p id="f1Result">Press Start</p>
-    </section>
-
-    <!-- CLICK GAME -->
-    <section id="clickGame" class="game hidden">
-        <h2>🎯 30 Second Challenge</h2>
-
-        <button id="startClick">
-            Start 30s Challenge
+        <button id="startF1">
+            START
         </button>
 
+        <p id="f1Result">
+            Press START
+        </p>
+
+    </section>
+
+    <!-- ================= TARGET GAME ================= -->
+
+    <section id="clickGame" class="game hidden">
+
+        <h2>🎯 30 Second Challenge</h2>
+
+        <p>
+            Click as many targets as possible in 30 seconds.
+            A new target appears only after you hit the previous one.
+        </p>
+
+        <button id="startClick">
+            START CHALLENGE
+        </button>
+
+        <p id="clickResult">
+            Press START CHALLENGE
+        </p>
 
         <div id="playArea">
             <div id="target"></div>
         </div>
+
     </section>
 
     <script src="script.js"></script>
+
 </body>
 </html>
