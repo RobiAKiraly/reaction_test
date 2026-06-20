@@ -9,99 +9,161 @@ function showGame(game) {
     }
 }
 
-/* ---------------- F1 GAME ---------------- */
+/* ===========================
+   F1 REACTION TEST
+=========================== */
 
 const lights = document.querySelectorAll(".light");
 const startF1 = document.getElementById("startF1");
 const f1Result = document.getElementById("f1Result");
 
 let startTime;
-let canClick = false;
+let canStop = false;
+let running = false;
 
 startF1.addEventListener("click", () => {
 
-    lights.forEach(light => {
-        light.classList.remove("active");
-        light.classList.remove("green");
-    });
+    if (!running) {
 
-    f1Result.textContent = "Wait for lights out...";
-    canClick = false;
+        running = true;
+        canStop = false;
 
-    let i = 0;
+        startF1.textContent = "STOP";
 
-    let interval = setInterval(() => {
+        lights.forEach(light => {
+            light.classList.remove("active");
+            light.classList.remove("green");
+        });
 
-        lights[i].classList.add("active");
-        i++;
+        f1Result.textContent = "Wait for lights out...";
 
-        if (i === 5) {
+        let i = 0;
 
-            clearInterval(interval);
+        const interval = setInterval(() => {
 
-            let delay = Math.random() * 3000 + 1000;
+            lights[i].classList.add("active");
+            i++;
 
-            setTimeout(() => {
+            if (i === 5) {
 
-                lights.forEach(light => {
-                    light.classList.remove("active");
-                    light.classList.add("green");
-                });
+                clearInterval(interval);
 
-                startTime = Date.now();
-                canClick = true;
+                const delay = Math.random() * 3000 + 1000;
 
-            }, delay);
+                setTimeout(() => {
+
+                    lights.forEach(light => {
+                        light.classList.remove("active");
+                        light.classList.add("green");
+                    });
+
+                    startTime = Date.now();
+                    canStop = true;
+
+                }, delay);
+            }
+
+        }, 1000);
+
+    } else {
+
+        if (canStop) {
+
+            const reaction = Date.now() - startTime;
+
+            f1Result.textContent =
+                `Reaction Time: ${reaction} ms`;
+
+        } else {
+
+            f1Result.textContent =
+                "Jump Start!";
+
         }
 
-    }, 1000);
-});
+        running = false;
+        canStop = false;
 
-document.addEventListener("keydown", e => {
-    if (e.code === "Space" && canClick) {
-        let reaction = Date.now() - startTime;
-        f1Result.textContent = `Reaction Time: ${reaction} ms`;
-        canClick = false;
+        startF1.textContent = "START";
+
+        lights.forEach(light => {
+            light.classList.remove("active");
+            light.classList.remove("green");
+        });
     }
 });
 
-/* ---------------- TARGET GAME ---------------- */
+/* ===========================
+   TARGET CHALLENGE
+=========================== */
 
 const target = document.getElementById("target");
 const playArea = document.getElementById("playArea");
 const clickResult = document.getElementById("clickResult");
 const startClick = document.getElementById("startClick");
 
-let clickStart;
+let score = 0;
+let gameRunning = false;
+let timeLeft = 30;
+let timer;
+
+function spawnTarget() {
+
+    const x =
+        Math.random() * (playArea.clientWidth - 60);
+
+    const y =
+        Math.random() * (playArea.clientHeight - 60);
+
+    target.style.left = x + "px";
+    target.style.top = y + "px";
+
+    target.style.display = "block";
+}
 
 startClick.addEventListener("click", () => {
 
-    clickResult.textContent = "Wait...";
+    if (gameRunning) return;
 
-    target.style.display = "none";
+    gameRunning = true;
+    score = 0;
+    timeLeft = 30;
 
-    let delay = Math.random() * 3000 + 1000;
+    clickResult.textContent =
+        `Time: 30s | Hits: 0`;
 
-    setTimeout(() => {
+    spawnTarget();
 
-        let x = Math.random() * (playArea.clientWidth - 60);
-        let y = Math.random() * (playArea.clientHeight - 60);
+    timer = setInterval(() => {
 
-        target.style.left = x + "px";
-        target.style.top = y + "px";
-        target.style.display = "block";
+        timeLeft--;
 
-        clickStart = Date.now();
+        clickResult.textContent =
+            `Time: ${timeLeft}s | Hits: ${score}`;
 
-    }, delay);
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            gameRunning = false;
+
+            target.style.display = "none";
+
+            clickResult.textContent =
+                `Finished! Score: ${score} hits`;
+        }
+
+    }, 1000);
 });
 
 target.addEventListener("click", () => {
 
-    let reaction = Date.now() - clickStart;
+    if (!gameRunning) return;
+
+    score++;
 
     clickResult.textContent =
-        `Reaction Time: ${reaction} ms`;
+        `Time: ${timeLeft}s | Hits: ${score}`;
 
-    target.style.display = "none";
+    spawnTarget();
 });
