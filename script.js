@@ -101,3 +101,16 @@ playArea.addEventListener("click", function (e) {
         updateStats();
     }
 });
+
+function showGame(game) {
+    const f1 = document.getElementById("f1Game");
+    const click = document.getElementById("clickGame");
+
+    if (game === "f1") {
+        f1.classList.remove("hidden");
+        click.classList.add("hidden");
+    } else if (game === "click") {
+        click.classList.remove("hidden");
+        f1.classList.add("hidden");
+    }
+}
