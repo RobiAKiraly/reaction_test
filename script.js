@@ -1,7 +1,24 @@
-/* ===========================
-   30 SECOND CHALLENGE
-=========================== */
+/* ========================================================
+   GLOBAL NAVIGATION (Kept at top to ensure availability)
+======================================================== */
+function showGame(game) {
+    const f1 = document.getElementById("f1Game");
+    const click = document.getElementById("clickGame");
 
+    if (!f1 || !click) return; // Guard clause to prevent errors
+
+    if (game === "f1") {
+        f1.classList.remove("hidden");
+        click.classList.add("hidden");
+    } else if (game === "click") {
+        click.classList.remove("hidden");
+        f1.classList.add("hidden");
+    }
+}
+
+/* ========================================================
+   30 SECOND CHALLENGE
+======================================================== */
 const target = document.getElementById("target");
 const playArea = document.getElementById("playArea");
 const clickResult = document.getElementById("clickResult");
@@ -14,7 +31,8 @@ let timeLeft = 30;
 let timer;
 
 function spawnTarget() {
-
+    if (!playArea || !target) return;
+    
     const x = Math.random() * (playArea.clientWidth - 60);
     const y = Math.random() * (playArea.clientHeight - 60);
 
@@ -24,9 +42,9 @@ function spawnTarget() {
 }
 
 function updateStats() {
-
+    if (!clickResult) return;
+    
     const totalClicks = score + misses;
-
     let accuracy = 100;
 
     if (totalClicks > 0) {
@@ -37,80 +55,63 @@ function updateStats() {
         `Time: ${timeLeft}s | Hits: ${score} | Accuracy: ${accuracy.toFixed(1)}%`;
 }
 
-startClick.addEventListener("click", () => {
+// Event Listeners wrapped with safety checks
+if (startClick) {
+    startClick.addEventListener("click", () => {
+        if (gameRunning) return;
 
-    if (gameRunning) return;
-
-    score = 0;
-    misses = 0;
-    timeLeft = 30;
-    gameRunning = true;
-
-    updateStats();
-
-    spawnTarget();
-
-    timer = setInterval(() => {
-
-        timeLeft--;
+        score = 0;
+        misses = 0;
+        timeLeft = 30;
+        gameRunning = true;
 
         updateStats();
+        spawnTarget();
 
-        if (timeLeft <= 0) {
+        timer = setInterval(() => {
+            timeLeft--;
+            updateStats();
 
-            clearInterval(timer);
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                gameRunning = false;
 
-            gameRunning = false;
+                if (target) target.style.display = "none";
 
-            target.style.display = "none";
+                const totalClicks = score + misses;
+                let accuracy = 100;
 
-            const totalClicks = score + misses;
+                if (totalClicks > 0) {
+                    accuracy = (score / totalClicks) * 100;
+                }
 
-            let accuracy = 100;
-
-            if (totalClicks > 0) {
-                accuracy = (score / totalClicks) * 100;
+                if (clickResult) {
+                    clickResult.textContent =
+                        `Finished! Hits: ${score} | Accuracy: ${accuracy.toFixed(1)}%`;
+                }
             }
+        }, 1000);
+    });
+}
 
-            clickResult.textContent =
-                `Finished! Hits: ${score} | Accuracy: ${accuracy.toFixed(1)}%`;
-        }
+if (target) {
+    target.addEventListener("click", function (e) {
+        if (!gameRunning) return;
 
-    }, 1000);
-});
-
-target.addEventListener("click", function (e) {
-
-    if (!gameRunning) return;
-
-    e.stopPropagation();
-
-    score++;
-
-    updateStats();
-
-    spawnTarget();
-});
-
-playArea.addEventListener("click", function (e) {
-
-    if (!gameRunning) return;
-
-    if (e.target !== target) {
-        misses++;
+        e.stopPropagation();
+        score++;
         updateStats();
-    }
-});
+        spawnTarget();
+    });
+}
 
-function showGame(game) {
-    const f1 = document.getElementById("f1Game");
-    const click = document.getElementById("clickGame");
+if (playArea) {
+    playArea.addEventListener("click", function (e) {
+        if (!gameRunning) return;
 
-    if (game === "f1") {
-        f1.classList.remove("hidden");
-        click.classList.add("hidden");
-    } else if (game === "click") {
-        click.classList.remove("hidden");
-        f1.classList.add("hidden");
-    }
+        if (e.target !== target) {
+            misses++;
+            updateStats();
+        }
+    });
 }
