@@ -61,6 +61,7 @@ startF1.addEventListener("click", () => {
                     canStop = true;
 
                 }, delay);
+
             }
 
         }, 1000);
@@ -76,8 +77,7 @@ startF1.addEventListener("click", () => {
 
         } else {
 
-            f1Result.textContent =
-                "Jump Start!";
+            f1Result.textContent = "Jump Start!";
 
         }
 
@@ -94,7 +94,7 @@ startF1.addEventListener("click", () => {
 });
 
 /* ===========================
-   TARGET CHALLENGE
+   30 SECOND CHALLENGE
 =========================== */
 
 const target = document.getElementById("target");
@@ -103,6 +103,7 @@ const clickResult = document.getElementById("clickResult");
 const startClick = document.getElementById("startClick");
 
 let score = 0;
+let totalClicks = 0;
 let gameRunning = false;
 let timeLeft = 30;
 let timer;
@@ -121,16 +122,28 @@ function spawnTarget() {
     target.style.display = "block";
 }
 
+function updateStats() {
+
+    let accuracy = 100;
+
+    if (totalClicks > 0) {
+        accuracy = (score / totalClicks) * 100;
+    }
+
+    clickResult.textContent =
+        `Time: ${timeLeft}s | Hits: ${score} | Accuracy: ${accuracy.toFixed(1)}%`;
+}
+
 startClick.addEventListener("click", () => {
 
     if (gameRunning) return;
 
-    gameRunning = true;
     score = 0;
+    totalClicks = 0;
     timeLeft = 30;
+    gameRunning = true;
 
-    clickResult.textContent =
-        `Time: 30s | Hits: 0`;
+    updateStats();
 
     spawnTarget();
 
@@ -138,8 +151,7 @@ startClick.addEventListener("click", () => {
 
         timeLeft--;
 
-        clickResult.textContent =
-            `Time: ${timeLeft}s | Hits: ${score}`;
+        updateStats();
 
         if (timeLeft <= 0) {
 
@@ -149,21 +161,37 @@ startClick.addEventListener("click", () => {
 
             target.style.display = "none";
 
+            const accuracy =
+                totalClicks > 0
+                    ? ((score / totalClicks) * 100).toFixed(1)
+                    : 100;
+
             clickResult.textContent =
-                `Finished! Score: ${score} hits`;
+                `Finished! Hits: ${score} | Accuracy: ${accuracy}%`;
         }
 
     }, 1000);
 });
 
-target.addEventListener("click", () => {
+target.addEventListener("click", (e) => {
 
     if (!gameRunning) return;
 
-    score++;
+    e.stopPropagation();
 
-    clickResult.textContent =
-        `Time: ${timeLeft}s | Hits: ${score}`;
+    score++;
+    totalClicks++;
+
+    updateStats();
 
     spawnTarget();
+});
+
+playArea.addEventListener("click", () => {
+
+    if (!gameRunning) return;
+
+    totalClicks++;
+
+    updateStats();
 });
